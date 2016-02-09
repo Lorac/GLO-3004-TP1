@@ -1,0 +1,11 @@
+class Banque ^=
+abstract
+	// Add variable, invariant and private method declarations here...
+interface
+	// Add public access function, selector and method declarations here...
+	// ...
+	build{}
+		post ?;
+end;
+
+// End
