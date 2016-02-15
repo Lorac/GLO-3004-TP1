@@ -1,3 +1,25 @@
+const NOMBRE_MAXIMAL_COMPTE:int ^= 20000;
+
+
+
+
+class Date ^=
+abstract
+  var
+    jour: int, 
+    mois: int, 
+    an: int;
+	
+	interface
+		//bissextile = {for y::int yield 4*y} -- ({for y::int yield 100*y} -- {for y::int yield 400*y})
+
+end;
+
+class Compte ^=
+abstract
+	var no: int
+end;
+
 class Banque ^=
 abstract
 	// Add variable, invariant and private method declarations here...
@@ -6,6 +28,6 @@ interface
 	// ...
 	build{}
 		post ?;
-end;
 
+end;
 // End
