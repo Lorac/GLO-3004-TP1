@@ -1,8 +1,5 @@
 const NOMBRE_MAXIMAL_COMPTE:int ^= 20000;
 
-
-
-
 class Date ^=
 abstract
   var
@@ -10,19 +7,57 @@ abstract
     mois: int, 
     an: int;
 	
-	interface
-		//bissextile = {for y::int yield 4*y} -- ({for y::int yield 100*y} -- {for y::int yield 400*y})
+		confined
+		function estBissextile : bool
+			^= 0 in set of int {an % 400} ++ (set of int {an % 4} -- set of int {an % 100});
 
 end;
 
 class Compte ^=
 abstract
-	var no: int
+	var numero: int,
+	solde: real,
+	nip : int,
+	dateOuverture : Date,
+	dateFermeture : Date;
+	
+invariant
+    numero in 1..19999;
+	
+//	confined
+//		function estOuvert : bool
+//			dateOuverture.jour = 5
+		
+interface
+	build{d:Date, numeroIdentification:int, numeroCompte:int}
+		post
+			dateOuverture! = d,
+			numero! = numeroCompte,
+			nip! = numeroIdentification,
+			dateFermeture! = d,
+			solde! = 0.0;
+			
+			
+	schema !ModifierSolde(nouveauSolde:real)
+//			dateOuverture caller estOuvert
+//			dateFermeture = null
+		post
+			solde! = nouveauSolde;
+			
+	schema !ModifierNIP(ni:int)
+		post
+			nip! = ni
+		
+
 end;
 
 class Banque ^=
 abstract
-	// Add variable, invariant and private method declarations here...
+
+	var comptes: map of (int -> Compte);
+	
+	invariant
+		#(comptes) >= NOMBRE_MAXIMAL_COMPTE
 interface
 	// Add public access function, selector and method declarations here...
 	// ...
