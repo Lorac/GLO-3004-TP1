@@ -42,6 +42,8 @@ invariant
 		
 interface
 	build{numeroCompte:int, s:real, d:Date}
+		pre
+			(0 < numeroCompte) & (numeroCompte < 20000)
 		post
 			dateOuverture! = d,
 			numero! = numeroCompte,
@@ -78,6 +80,9 @@ interface
 	
 	function GetDateFermeture:Date || void
 		^= dateFermeture;
+		
+	function GetNIP:int
+		^= nip;
 
 		
 end;
@@ -88,7 +93,7 @@ abstract
 	var comptes: map of (int -> Compte);
 	
 	invariant
-		#(comptes) >= NOMBRE_MAXIMAL_COMPTE
+		#(comptes) <= NOMBRE_MAXIMAL_COMPTE
 		
 interface
 	// Add public access function, selector and method declarations here...
@@ -100,7 +105,9 @@ interface
 	schema !OuvrirCompte(numeroCompte:int, solde:real, dateCourante:Date)
 		pre
 			solde > 0.0,
-			numeroCompte ~in comptes.dom
+			numeroCompte ~in comptes.dom,
+			#(comptes.dom) < 20000,
+			(0 < numeroCompte) & (numeroCompte < 20000)
 		post
 			comptes! = comptes.append(numeroCompte -> Compte{numeroCompte, solde, dateCourante});
 			
@@ -125,13 +132,16 @@ interface
 			
 	schema !ModifierSolde(numeroCompte:int, solde:real)
 		pre
-			numeroCompte in comptes.dom
+			numeroCompte in comptes.dom,
+			comptes[numeroCompte].GetDateFermeture = (null as Date||void)
 		post
 			comptes[numeroCompte]!ModifierSolde(solde);
 		
 	schema !ModifierNip(numeroCompte:int, nip:int)
 		pre
-			numeroCompte in comptes.dom
+			numeroCompte in comptes.dom,
+			nip > 0,
+			comptes[numeroCompte].GetNIP ~= nip
 		post
 			comptes[numeroCompte]!ModifierNIP(nip);
 			
