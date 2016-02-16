@@ -7,9 +7,19 @@ abstract
     mois: int, 
     an: int;
 	
-		confined
+	confined
 		function estBissextile : bool
 			^= 0 in set of int {an % 400} ++ (set of int {an % 4} -- set of int {an % 100});
+	
+	interface
+		build{j:int, m:int, y:int}
+			pre
+				j in 1..31,
+				m in 1..12
+			post
+				jour! = j,
+				mois! = m,
+				an! = y;
 	
 	//interface
 		//function NombreJoursDifference(date:Date)
@@ -48,19 +58,28 @@ interface
 			solde! = nouveauSolde;
 			
 	schema !ModifierNIP(ni:int)
+		pre
+			ni > 0,
+			nip ~= ni
 		post
 			nip! = ni;
 			
-	function GetDateOuverture:Date || void
+	schema !ModifierDateFermeture(d:Date || void)
+		pre 
+			d ~= null
+		post
+			dateFermeture! = d;
+	
+	function GetDateOuverture:Date
 		^= dateOuverture;
 	
 	function GetSolde:real
 		^= solde;
 	
-	function GetDateFermeture: Date || void
+	function GetDateFermeture:Date || void
 		^= dateFermeture;
-		
 
+		
 end;
 
 class Banque ^=
@@ -75,7 +94,8 @@ interface
 	// Add public access function, selector and method declarations here...
 	// ...
 	build{}
-		post ?;
+		post 
+			comptes! = map of (int -> Compte){};
 		
 	schema !OuvrirCompte(numeroCompte:int, solde:real, dateCourante:Date)
 		pre
@@ -91,9 +111,9 @@ interface
 			comptes[numeroCompte].GetSolde = 0.0,
 			comptes[numeroCompte].GetDateFermeture = null
 		post	
-			comptes[numeroCompte].GetDateOuverture! = dateCourante;
+			comptes[numeroCompte]!ModifierDateFermeture(dateCourante);
 			
-	schema !SupprimerUnCompte(numeroCompte:int, dateCourante:Date || void)
+	schema !SupprimerUnCompte(numeroCompte:int, dateCourante:Date || void)
 		pre
 			numeroCompte in comptes.dom,
 			dateCourante ~= null,
@@ -102,11 +122,19 @@ interface
 			//comptes[numeroCompte].GetDateFermeture
 		post
 			comptes! = comptes.remove(numeroCompte);
-		
+			
 	schema !ModifierSolde(numeroCompte:int, solde:real)
 		pre
 			numeroCompte in comptes.dom
 		post
-			Compte.ModifierSolde{solde};
+			comptes[numeroCompte]!ModifierSolde(solde);
+		
+	schema !ModifierNip(numeroCompte:int, nip:int)
+		pre
+			numeroCompte in comptes.dom
+		post
+			comptes[numeroCompte]!ModifierNIP(nip);
+			
+
 end;
 // End
