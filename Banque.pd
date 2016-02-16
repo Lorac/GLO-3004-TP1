@@ -10,7 +10,9 @@ abstract
 		confined
 		function estBissextile : bool
 			^= 0 in set of int {an % 400} ++ (set of int {an % 4} -- set of int {an % 100});
-
+	
+	//interface
+		//function NombreJoursDifference(date:Date)
 end;
 
 class Compte ^=
@@ -19,7 +21,7 @@ abstract
 	solde: real,
 	nip : int,
 	dateOuverture : Date,
-	dateFermeture : Date;
+	dateFermeture : Date || void;
 	
 invariant
     numero in 1..19999;
@@ -29,24 +31,34 @@ invariant
 //			dateOuverture.jour = 5
 		
 interface
-	build{d:Date, numeroIdentification:int, numeroCompte:int}
+	build{numeroCompte:int, s:real, d:Date}
 		post
 			dateOuverture! = d,
 			numero! = numeroCompte,
-			nip! = numeroIdentification,
-			dateFermeture! = d,
-			solde! = 0.0;
+			nip! = 0,
+			dateFermeture! = null,
+			solde! = s;
 			
 			
 	schema !ModifierSolde(nouveauSolde:real)
+		pre
 //			dateOuverture caller estOuvert
-//			dateFermeture = null
+			dateFermeture = null
 		post
 			solde! = nouveauSolde;
 			
 	schema !ModifierNIP(ni:int)
 		post
-			nip! = ni
+			nip! = ni;
+			
+	function GetDateOuverture:Date || void
+		^= dateOuverture;
+	
+	function GetSolde:real
+		^= solde;
+	
+	function GetDateFermeture: Date || void
+		^= dateFermeture;
 		
 
 end;
@@ -58,11 +70,43 @@ abstract
 	
 	invariant
 		#(comptes) >= NOMBRE_MAXIMAL_COMPTE
+		
 interface
 	// Add public access function, selector and method declarations here...
 	// ...
 	build{}
 		post ?;
-
+		
+	schema !OuvrirCompte(numeroCompte:int, solde:real, dateCourante:Date)
+		pre
+			solde > 0.0,
+			numeroCompte ~in comptes.dom
+		post
+			comptes! = comptes.append(numeroCompte -> Compte{numeroCompte, solde, dateCourante});
+			
+	schema !FermerUnCompte(numeroCompte:int, dateCourante:Date || void)
+		pre
+			numeroCompte in comptes.dom,
+			dateCourante ~= null,
+			comptes[numeroCompte].GetSolde = 0.0,
+			comptes[numeroCompte].GetDateFermeture = null
+		post	
+			comptes[numeroCompte].GetDateOuverture! = dateCourante;
+			
+	schema !SupprimerUnCompte(numeroCompte:int, dateCourante:Date || void)
+		pre
+			numeroCompte in comptes.dom,
+			dateCourante ~= null,
+			comptes[numeroCompte].GetSolde = 0.0,
+			comptes[numeroCompte].GetDateFermeture ~= null
+			//comptes[numeroCompte].GetDateFermeture
+		post
+			comptes! = comptes.remove(numeroCompte);
+		
+	schema !ModifierSolde(numeroCompte:int, solde:real)
+		pre
+			numeroCompte in comptes.dom
+		post
+			Compte.ModifierSolde{solde};
 end;
 // End
