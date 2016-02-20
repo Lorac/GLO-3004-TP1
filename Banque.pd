@@ -25,6 +25,11 @@ class Date ^=
 				jour! = j,
 				mois! = m,
 				an! = y;
+				
+		function EstDeuxAnneesAvant(autreDate:Date):bool
+			^= (autreDate.an - an >= 3) 
+			| (autreDate.an - an = 2 & autreDate.mois - mois > 0) 
+			| (autreDate.an - an = 2 & autreDate.mois - mois = 0 & autreDate.jour - jour >= 0)
 end;
 
 class Compte ^=
@@ -117,7 +122,8 @@ class Banque ^=
 				numeroCompte in comptes.dom,
 				dateCourante ~= null,
 				comptes[numeroCompte].GetSolde = 0.0,
-				comptes[numeroCompte].GetDateFermeture ~= null
+				comptes[numeroCompte].GetDateFermeture ~= null,
+				(comptes[numeroCompte].GetDateFermeture is Date).EstDeuxAnneesAvant((dateCourante is Date))
 			post
 				comptes! = comptes.remove(numeroCompte);
 				
