@@ -1,11 +1,11 @@
 const NOMBRE_MAXIMAL_COMPTE:int ^= 20000;
 
 class Date ^=
-abstract
-  var
-    jour: int, 
-    mois: int, 
-    an: int;
+	abstract
+	  var
+		jour: int, 
+		mois: int, 
+		an: int;	
 	
 	interface
 		build{j:int, m:int, y:int}
@@ -25,130 +25,114 @@ abstract
 				jour! = j,
 				mois! = m,
 				an! = y;
-	//interface
-		//function NombreJoursDifference(date:Date)
 end;
 
 class Compte ^=
-abstract
-	var numero: int,
-	solde: real,
-	nip : int,
-	dateOuverture : Date,
-	dateFermeture : Date || void;
-	
-invariant
-    numero in 1..19999;
-	
-//	confined
-//		function estOuvert : bool
-//			dateOuverture.jour = 5
+	abstract
+		var numero: int,
+		solde: real,
+		nip : int,
+		dateOuverture : Date,
+		dateFermeture : Date || void;
 		
-interface
-	build{numeroCompte:int, s:real, d:Date}
-		pre
-			(0 < numeroCompte) & (numeroCompte < 20000)
-		post
-			dateOuverture! = d,
-			numero! = numeroCompte,
-			nip! = 0,
-			dateFermeture! = null,
-			solde! = s;
+	invariant
+		numero in 1..NOMBRE_MAXIMAL_COMPTE;
 			
-			
-	schema !ModifierSolde(nouveauSolde:real)
-		pre
-//			dateOuverture caller estOuvert
-			dateFermeture = null
-		post
-			solde! = nouveauSolde;
-			
-	schema !ModifierNIP(ni:int)
-		pre
-			ni > 0,
-			nip ~= ni
-		post
-			nip! = ni;
-			
-	schema !ModifierDateFermeture(d:Date || void)
-		pre 
-			d ~= null
-		post
-			dateFermeture! = d;
-	
-	function GetDateOuverture:Date
-		^= dateOuverture;
-	
-	function GetSolde:real
-		^= solde;
-	
-	function GetDateFermeture:Date || void
-		^= dateFermeture;
+	interface
+		build{numeroCompte:int, s:real, d:Date}
+			pre
+				(0 < numeroCompte) & (numeroCompte < 20000)
+			post
+				dateOuverture! = d,
+				numero! = numeroCompte,
+				nip! = 0,
+				dateFermeture! = null,
+				solde! = s;
+				
+				
+		schema !ModifierSolde(nouveauSolde:real)
+			pre
+				dateFermeture = null
+			post
+				solde! = nouveauSolde;
+				
+		schema !ModifierNIP(ni:int)
+			pre
+				ni > 0,
+				nip ~= ni
+			post
+				nip! = ni;
+				
+		schema !ModifierDateFermeture(d:Date || void)
+			pre 
+				d ~= null
+			post
+				dateFermeture! = d;
 		
-	function GetNIP:int
-		^= nip;
-
+		function GetDateOuverture:Date
+			^= dateOuverture;
 		
+		function GetSolde:real
+			^= solde;
+		
+		function GetDateFermeture:Date || void
+			^= dateFermeture;
+			
+		function GetNIP:int
+			^= nip;
 end;
 
 class Banque ^=
-abstract
-
-	var comptes: map of (int -> Compte);
+	abstract
+		var comptes: map of (int -> Compte);
 	
 	invariant
 		#(comptes) <= NOMBRE_MAXIMAL_COMPTE
 		
-interface
-	// Add public access function, selector and method declarations here...
-	// ...
-	build{}
-		post 
-			comptes! = map of (int -> Compte){};
-		
-	schema !OuvrirCompte(numeroCompte:int, solde:real, dateCourante:Date)
-		pre
-			solde > 0.0,
-			numeroCompte ~in comptes.dom,
-			#(comptes.dom) < 20000,
-			(0 < numeroCompte) & (numeroCompte < 20000)
-		post
-			comptes! = comptes.append(numeroCompte -> Compte{numeroCompte, solde, dateCourante});
+	interface
+		build{}
+			post 
+				comptes! = map of (int -> Compte){};
 			
-	schema !FermerUnCompte(numeroCompte:int, dateCourante:Date || void)
-		pre
-			numeroCompte in comptes.dom,
-			dateCourante ~= null,
-			comptes[numeroCompte].GetSolde = 0.0,
-			comptes[numeroCompte].GetDateFermeture = null
-		post	
-			comptes[numeroCompte]!ModifierDateFermeture(dateCourante);
+		schema !OuvrirCompte(numeroCompte:int, solde:real, dateCourante:Date)
+			pre
+				solde > 0.0,
+				numeroCompte ~in comptes.dom,
+				#(comptes.dom) < NOMBRE_MAXIMAL_COMPTE,
+				(0 < numeroCompte) & (numeroCompte < NOMBRE_MAXIMAL_COMPTE)
+			post
+				comptes! = comptes.append(numeroCompte -> Compte{numeroCompte, solde, dateCourante});
+				
+		schema !FermerUnCompte(numeroCompte:int, dateCourante:Date || void)
+			pre
+				numeroCompte in comptes.dom,
+				dateCourante ~= null,
+				comptes[numeroCompte].GetSolde = 0.0,
+				comptes[numeroCompte].GetDateFermeture = null
+			post	
+				comptes[numeroCompte]!ModifierDateFermeture(dateCourante);
+				
+		schema !SupprimerUnCompte(numeroCompte:int, dateCourante:Date || void)
+			pre
+				numeroCompte in comptes.dom,
+				dateCourante ~= null,
+				comptes[numeroCompte].GetSolde = 0.0,
+				comptes[numeroCompte].GetDateFermeture ~= null
+			post
+				comptes! = comptes.remove(numeroCompte);
+				
+		schema !ModifierSolde(numeroCompte:int, solde:real)
+			pre
+				numeroCompte in comptes.dom,
+				comptes[numeroCompte].GetDateFermeture = (null as Date||void)
+			post
+				comptes[numeroCompte]!ModifierSolde(solde);
 			
-	schema !SupprimerUnCompte(numeroCompte:int, dateCourante:Date || void)
-		pre
-			numeroCompte in comptes.dom,
-			dateCourante ~= null,
-			comptes[numeroCompte].GetSolde = 0.0,
-			comptes[numeroCompte].GetDateFermeture ~= null
-			//comptes[numeroCompte].GetDateFermeture
-		post
-			comptes! = comptes.remove(numeroCompte);
-			
-	schema !ModifierSolde(numeroCompte:int, solde:real)
-		pre
-			numeroCompte in comptes.dom,
-			comptes[numeroCompte].GetDateFermeture = (null as Date||void)
-		post
-			comptes[numeroCompte]!ModifierSolde(solde);
-		
-	schema !ModifierNip(numeroCompte:int, nip:int)
-		pre
-			numeroCompte in comptes.dom,
-			nip > 0,
-			comptes[numeroCompte].GetNIP ~= nip
-		post
-			comptes[numeroCompte]!ModifierNIP(nip);
-			
-
+		schema !ModifierNip(numeroCompte:int, nip:int)
+			pre
+				numeroCompte in comptes.dom,
+				nip > 0,
+				comptes[numeroCompte].GetNIP ~= nip
+			post
+				comptes[numeroCompte]!ModifierNIP(nip);
 end;
-// End
