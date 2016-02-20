@@ -7,20 +7,24 @@ abstract
     mois: int, 
     an: int;
 	
-	confined
-		function estBissextile : bool
-			^= 0 in set of int {an % 400} ++ (set of int {an % 4} -- set of int {an % 100});
-	
 	interface
 		build{j:int, m:int, y:int}
 			pre
 				j in 1..31,
-				m in 1..12
+				m in 1..12,
+				(
+				[m = 2 & j = 29]:
+					((y % 400 = 0)|(~(y % 100 = 0) & (y % 4 = 0))),
+				[j=31 & (m = 1 | m = 3 | m = 5 | m = 7 | m = 8 | m = 10 | m = 12)]:
+					true,
+				[j=30 & m = 2]:
+					false,
+				[]:
+					true)
 			post
 				jour! = j,
 				mois! = m,
 				an! = y;
-	
 	//interface
 		//function NombreJoursDifference(date:Date)
 end;
