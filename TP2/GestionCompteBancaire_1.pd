@@ -1,0 +1,219 @@
+// Équipe #1
+// Antoine Giasson (111 044 655), GLO
+// Maxime Charron (111 038 084), GLO
+// Maxime Roussin-Bélanger (111 018 750), IFT
+// Julien Duchesne (111 042 624), GLO
+
+// Types pour ATM
+
+class ETAT ^= enum inactif , carteIns ,nipOk, retrait , chNIP end ;
+
+class BOUTON ^= enum cash , nip end ;
+
+class NCompte ^= NumCompte || void; 
+
+//    fin
+
+// numéro de banque maximal
+
+const maxNum : int ^= 29999;
+
+class NumCompte ^= those j: int :- 1 <= j <= maxNum   ;
+
+class Jour   ^= those j: int :- 1 <= j <= 31;
+class Mois ^= those m : int :- 1 <= m <= 12; 
+class An ^= those a : int :- 1900 <= a <= 20000; 
+
+class Date ^= 
+abstract
+var 
+   j: Jour,
+   m : Mois, 
+   a : An; 
+  invariant 
+    ( [m in set of int {1,3,5,7,8,10,12}] : 1 <= j & j <= 31,
+	  [ m in set of int {4,6,9,11}] : 1 <= j & j <= 30, 
+	  [ m = 2 & (a % 4 = 0 )&(a % 100 ~= 0)] : 
+	    1 <= j <= 29, 
+      [ m = 2 &  (a % 400 = 0) ]: 1 <= j & j <= 29, 
+	   [ ] : 1 <= j <= 28
+	);
+  interface 
+   build{!j:Jour, !m:Mois,!a:An}
+    pre 
+	 ( [m in set of int {1,3,5,7,8,10,12}] : 1 <= j & j <= 31,
+	  [ m in set of int {4,6,9,11}] : 1 <= j & j <= 30, 
+	  [ m = 2 & (a % 4 = 0 )&(a % 100 ~= 0)] : 
+	    1 <= j <= 29, 
+      [ m = 2 &  (a % 400 = 0) ]: 1 <= j & j <= 29, 
+	   [ ] : 1 <= j <= 28
+	) ;
+    
+  
+     function j, m, a
+end;
+// Dat est utilisée pour la date de fermeture. 
+// null veut dire le compte est ouvert
+class Dat ^= Date || void; 
+
+
+final class Compte ^= 
+abstract
+  var 
+	solde : int, 
+	nip : int, 
+	ouverture : Date, 
+	fermeture : Dat;
+ 
+   
+interface
+ build{!solde:int,!nip:int,!ouverture:Date,!fermeture : Dat };
+ 
+
+ 
+ schema !modifierSolde(n : int)
+    post solde! = n ;
+
+  schema !modifierNIP(nNIP : int)
+    pre nNIP ~= nip
+    post nip! = nNIP;
+function  solde, nip, ouverture, fermeture	
+
+
+end; 	
+     
+
+
+final class Banque ^=
+
+abstract
+
+  var comptes : map of (NumCompte -> Compte);
+      
+
+  invariant 
+  
+  // En fait cet invariant n'est pas nécessaire. C'est le type NumCompte 
+  // qui précise cette contrainte. Pas besoin de la répéter. 
+  
+      #comptes <= maxNum
+	  
+	  
+       
+	   
+interface
+
+  function comptes ;
+
+ build{}
+    post comptes! = map  of (NumCompte -> Compte){} ;
+
+  schema !ouvrirCompte(soldeInit : int , nc : NumCompte, o:Date)
+    pre soldeInit > 0 , #comptes < maxNum, 
+		nc ~in comptes.dom
+    post 
+           comptes!= comptes.append(nc -> Compte{soldeInit,0, o, null}) ;
+		   
+schema !fermerCompte( nc : NumCompte,f:Dat)
+    pre 
+		nc in comptes.dom, 
+		comptes[nc].solde = 0, 
+		comptes[nc].fermeture = null, 
+		f within Date
+    post 
+           comptes!= 
+comptes.remove(nc).append(nc -> Compte{0,comptes[nc].nip,
+comptes[nc].ouverture, f}) ;
+		   
+ schema !supprimerCompte(nc : NumCompte, d:Date)
+    pre nc in comptes.dom, comptes[nc].solde = 0,
+	    comptes[nc].fermeture within Date,
+	    ( (let f ^= (comptes[nc].fermeture is Date);
+		   (d.a > f.a +2) | 
+		    (d.a = f.a+2 & 
+			  d.m > f.m) | 
+			(d.a = f.a+2 & 
+			  d.m = f.m &
+			  d.j > f.j)
+			)
+		)
+    post 
+           comptes!= comptes.remove(nc) ;
+
+  schema !ch_Solde(nc : NumCompte , n : int)
+	pre  nc in comptes.dom
+    post 
+	 comptes[nc]!modifierSolde(n);
+
+
+  schema !ch_NIP(nc :NumCompte , nNIP : int)
+    pre nc in comptes.dom, nNIP ~= comptes[nc].nip
+    post 
+	  comptes[nc]!modifierNIP(nNIP);
+  
+
+end;
+
+final class ATM ^=
+
+abstract
+
+ var b : Banque ,
+      ett : ETAT ,
+      nCompte : NCompte;
+invariant 
+ 
+  ( nCompte = null | 1 <= (nCompte is NumCompte) <= maxNum);
+
+  function encNIP(nip : nat) : nat ^= nip*nip ;
+
+
+
+interface
+
+  schema !insererCarte(nCarte : NumCompte , msg! : string)
+    pre ett = ETAT inactif, nCarte in b.comptes.dom
+    post ett! = carteIns@ETAT , nCompte! = nCarte , msg! = "Entrer NIP" ;
+
+  schema !NIP_OK(pin : nat , msg! : string)
+    pre 
+
+	ett = carteIns@ETAT , 
+	nCompte within NumCompte,
+	 (nCompte is NumCompte)  in b.comptes.dom,
+	 b.comptes[nCompte is NumCompte].fermeture = null,
+	encNIP(pin) = b.comptes[(nCompte is NumCompte)].nip
+    post ett! = nipOk@ETAT , msg! = "Choisissez un service" ;
+
+  schema !NIP_KO(pin : nat , msg! : string)
+    pre 
+
+	ett = ETAT carteIns , 
+	nCompte within NumCompte,
+	(nCompte is NumCompte) in b.comptes.dom,
+	b.comptes[nCompte is NumCompte].fermeture = null,
+	encNIP(pin) ~= b.comptes[nCompte is NumCompte].nip
+    post ett! = inactif@ETAT , msg! = "NIP incorrect, carte rejetée." ;
+
+  schema !choixService( bout : BOUTON )
+    pre 
+
+	ett =  nipOk@ETAT
+    post ett! = ( [bout =  cash@BOUTON] : retrait@ETAT ,
+                    [bout =  nip@BOUTON] :  chNIP@ETAT
+                  ) ;
+
+  
+  build{!b:Banque}
+	
+    post 
+
+         ett! = inactif@ETAT , nCompte! = null ;
+
+end;
+
+
+
+
+
+// End
