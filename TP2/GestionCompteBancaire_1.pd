@@ -10,7 +10,7 @@ class ETAT ^= enum inactif , carteIns ,nipOk, retrait , chNIP end ;
 
 class BOUTON ^= enum cash , nip end ;
 
-class NCompte ^= NumCompte || void; 
+class NCompte ^= NumCompte || void;
 
 //    fin
 
@@ -20,7 +20,7 @@ const maxNum : int ^= 29999;
 
 class NumCompte ^= those j: int :- 1 <= j <= maxNum   ;
 
-class Jour   ^= those j: int :- 1 <= j <= 31;
+class Jour ^= those j: int :- 1 <= j <= 31;
 class Mois ^= those m : int :- 1 <= m <= 12; 
 class An ^= those a : int :- 1900 <= a <= 20000; 
 
@@ -55,7 +55,8 @@ end;
 // Dat est utilisée pour la date de fermeture. 
 // null veut dire le compte est ouvert
 class Dat ^= Date || void; 
-
+const maxLiquide : int ^= 1000;
+const minSolde : int ^= 50;
 
 final class Compte ^= 
 abstract
@@ -63,21 +64,46 @@ abstract
 	solde : int, 
 	nip : int, 
 	ouverture : Date, 
-	fermeture : Dat;
- 
+	fermeture : Dat,
+	liquide : int;
+	
+invariant
+	liquide <= maxLiquide,
+	(fermeture within Date) | (solde >= minSolde);
    
 interface
- build{!solde:int,!nip:int,!ouverture:Date,!fermeture : Dat };
- 
-
- 
- schema !modifierSolde(n : int)
-    post solde! = n ;
+  build{!solde:int,!nip:int,!ouverture:Date,!fermeture : Dat}
+	pre (solde >= minSolde) | (fermeture within Date)
+	post liquide! = 0;
+	
+  schema !retrait(n : int)
+	pre 
+		n > 0,
+		solde - n >= minSolde
+	post solde! = solde - n;
+	
+  schema !depot(n : int)
+	pre n > 0
+	post solde! = solde + n;
+	
+  schema !depotLiquide(n : int)
+    pre 
+		n > 0,
+		liquide + n <= maxLiquide
+	post
+		liquide! = liquide + n,
+		solde! = solde + n;
+		
+  schema !miseAZeroLiquide
+	post liquide! = 0;
+ //schema !modifierSolde(n : int)
+ //	pre (fermeture = null | n >= 50)
+ // post solde! = n ;
 
   schema !modifierNIP(nNIP : int)
     pre nNIP ~= nip
     post nip! = nNIP;
-function  solde, nip, ouverture, fermeture	
+function  solde, nip, ouverture, fermeture, liquide
 
 
 end; 	
@@ -109,7 +135,7 @@ interface
     post comptes! = map  of (NumCompte -> Compte){} ;
 
   schema !ouvrirCompte(soldeInit : int , nc : NumCompte, o:Date)
-    pre soldeInit > 0 , #comptes < maxNum, 
+    pre soldeInit >= minSolde , #comptes < maxNum, 
 		nc ~in comptes.dom
     post 
            comptes!= comptes.append(nc -> Compte{soldeInit,0, o, null}) ;
@@ -117,7 +143,7 @@ interface
 schema !fermerCompte( nc : NumCompte,f:Dat)
     pre 
 		nc in comptes.dom, 
-		comptes[nc].solde = 0, 
+		comptes[nc].solde = minSolde, 
 		comptes[nc].fermeture = null, 
 		f within Date
     post 
@@ -139,11 +165,36 @@ comptes[nc].ouverture, f}) ;
 		)
     post 
            comptes!= comptes.remove(nc) ;
+	
+  schema !retraitC(nc : NumCompte, n : int)
+	pre 
+		nc in comptes.dom,
+		n > 0,
+		comptes[nc].solde - n >= minSolde
+	post comptes[nc]!retrait(n);
 
-  schema !ch_Solde(nc : NumCompte , n : int)
-	pre  nc in comptes.dom
-    post 
-	 comptes[nc]!modifierSolde(n);
+  schema !depotC(nc : NumCompte, n : int)
+	pre 
+		nc in comptes.dom,
+		n > 0
+	post comptes[nc]!depot(n);
+	
+  schema !depotLC(nc : NumCompte, n : int)
+	pre 
+		nc in comptes.dom,
+		n > 0,
+		comptes[nc].liquide + n <= maxLiquide
+	post comptes[nc]!depotLiquide(n);
+	
+  schema !virementC(nc1 : NumCompte, nc2 : NumCompte, n : int)
+	pre 
+		nc1 in comptes.dom,
+		nc2 in comptes.dom,
+		n > 0,
+		comptes[nc1].solde - n >= minSolde
+	post
+		comptes[nc1]!retrait(n) then comptes[nc2]!depot(n);
+		
 
 
   schema !ch_NIP(nc :NumCompte , nNIP : int)
@@ -211,8 +262,6 @@ interface
          ett! = inactif@ETAT , nCompte! = null ;
 
 end;
-
-
 
 
 
