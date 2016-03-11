@@ -96,9 +96,6 @@ interface
 		
   schema !miseAZeroLiquide
 	post liquide! = 0;
- //schema !modifierSolde(n : int)
- //	pre (fermeture = null | n >= 50)
- // post solde! = n ;
 
   schema !modifierNIP(nNIP : int)
     pre nNIP ~= nip
@@ -114,15 +111,22 @@ final class Banque ^=
 
 abstract
 
-  var comptes : map of (NumCompte -> Compte);
-      
+  var comptes : map of (NumCompte -> Compte),
+      soldeG : int,
+	  soldeV : int,
+	  entrees : int,
+	  sorties : int,
+	  gains : int,
+	  dateExercice : Date;
+	  
 
   invariant 
   
   // En fait cet invariant n'est pas nécessaire. C'est le type NumCompte 
   // qui précise cette contrainte. Pas besoin de la répéter. 
   
-      #comptes <= maxNum
+      #comptes <= maxNum,
+	  soldeG - entrees + sorties = soldeV;
 	  
 	  
        
@@ -132,7 +136,15 @@ interface
   function comptes ;
 
  build{}
-    post comptes! = map  of (NumCompte -> Compte){} ;
+    post 
+		comptes! = map  of (NumCompte -> Compte){},
+		soldeG! = 0,
+		soldeV! = 0,
+		entrees! = 0,
+		sorties! = 0,
+		gains! = 0,
+		dateExercice! = Date{1, 3, 1900};
+	
 
   schema !ouvrirCompte(soldeInit : int , nc : NumCompte, o:Date)
     pre soldeInit >= minSolde , #comptes < maxNum, 
@@ -152,7 +164,7 @@ comptes.remove(nc).append(nc -> Compte{0,comptes[nc].nip,
 comptes[nc].ouverture, f}) ;
 		   
  schema !supprimerCompte(nc : NumCompte, d:Date)
-    pre nc in comptes.dom, comptes[nc].solde = 0,
+    pre nc in comptes.dom, comptes[nc].solde = minSolde,
 	    comptes[nc].fermeture within Date,
 	    ( (let f ^= (comptes[nc].fermeture is Date);
 		   (d.a > f.a +2) | 
@@ -171,20 +183,29 @@ comptes[nc].ouverture, f}) ;
 		nc in comptes.dom,
 		n > 0,
 		comptes[nc].solde - n >= minSolde
-	post comptes[nc]!retrait(n);
+	post 
+		soldeG! = soldeG - n,
+		sorties! = sorties + n,
+		comptes[nc]!retrait(n);
 
   schema !depotC(nc : NumCompte, n : int)
 	pre 
 		nc in comptes.dom,
 		n > 0
-	post comptes[nc]!depot(n);
+	post 
+		soldeG! = soldeG + n,
+		entrees! = entrees + n,
+		comptes[nc]!depot(n);
 	
   schema !depotLC(nc : NumCompte, n : int)
 	pre 
 		nc in comptes.dom,
 		n > 0,
 		comptes[nc].liquide + n <= maxLiquide
-	post comptes[nc]!depotLiquide(n);
+	post
+		soldeG! = soldeG + n,
+		entrees! = entrees + n,
+		comptes[nc]!depotLiquide(n);
 	
   schema !virementC(nc1 : NumCompte, nc2 : NumCompte, n : int)
 	pre 
