@@ -117,6 +117,7 @@ abstract
 	  entrees : int,
 	  sorties : int,
 	  gains : int,
+	  frais : int,
 	  dateExercice : Date;
 	  
 
@@ -143,6 +144,7 @@ interface
 		entrees! = 0,
 		sorties! = 0,
 		gains! = 0,
+		frais!= 1,
 		dateExercice! = Date{1, 3, 1900};
 	
 
@@ -222,7 +224,40 @@ comptes[nc].ouverture, f}) ;
     pre nc in comptes.dom, nNIP ~= comptes[nc].nip
     post 
 	  comptes[nc]!modifierNIP(nNIP);
+	  
+  schema !bilanV(d: Date)
+    pre 
+		d.j = dateExercice.j,
+		d.m = dateExercice.m
+	post 
+		entrees! = 0,
+		sorties! = 0,
+		//Il manque une condition ici
+		soldeG! = soldeV;
+
+  schema !versExterieur(nc : NumCompte, n : int)
+	pre 
+		nc in comptes.dom,
+		comptes[nc].solde - (n + frais) >= minSolde, 
+		comptes[nc].fermeture = null,
+		(n + frais) > 0
+	post 
+		soldeG! = soldeG - n +  frais ,
+		entrees! = entrees + frais,
+		sorties! = sorties + n,
+		comptes[nc]!retrait(n+frais);
   
+  schema !versInterieur(nc : NumCompte, n : int)
+	pre 
+		nc in comptes.dom,
+		comptes[nc].solde + n >=  frais, 
+		comptes[nc].fermeture = null,
+		(n - frais) > 0
+	post 
+		soldeG! = soldeG + n ,
+		entrees! = entrees + n ,
+		sorties! = sorties,
+		comptes[nc]!depot(n-frais);
 
 end;
 
@@ -299,7 +334,8 @@ interface
                     [bout =  nip@BOUTON] :  chNIP@ETAT
                   ) ;
 
-  
+
+	
   build{!b:Banque}
 	
     post 
