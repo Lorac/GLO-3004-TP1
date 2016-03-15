@@ -243,6 +243,30 @@ invariant
 
 interface
 
+  schema !retirer(montant:int)
+    pre 
+	   montant > 0,
+	   ett = retrait@ETAT,
+	   nCompte ~= null,
+	   (nCompte is NumCompte) in b.comptes.dom,
+	   b.comptes[nCompte is NumCompte].fermeture = null,
+	   (49 + montant) < b.comptes[nCompte is int].solde
+	post
+	  ett! = inactif@ETAT,
+	  b!retraitC(nCompte is NumCompte, montant);
+	  
+  schema !changer_nip(nip:int)
+     pre
+	   ett = chNIP@ETAT,
+	   nCompte ~= null,
+	   (nCompte is NumCompte) in b.comptes.dom,
+	   b.comptes[nCompte is NumCompte].fermeture = null,
+	   encNIP(nip) ~= b.comptes[(nCompte is NumCompte)].nip
+	 post
+	   b!ch_NIP((nCompte is NumCompte), nip),
+	   ~(b.comptes[(nCompte is NumCompte)].nip = nip),
+	   ett! = inactif@ETAT;
+		
   schema !insererCarte(nCarte : NumCompte , msg! : string)
     pre ett = ETAT inactif, nCarte in b.comptes.dom
     post ett! = carteIns@ETAT , nCompte! = nCarte , msg! = "Entrer NIP" ;
