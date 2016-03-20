@@ -221,9 +221,11 @@ comptes[nc].ouverture, f}) ;
 
 
   schema !ch_NIP(nc :NumCompte , nNIP : int)
-    pre nc in comptes.dom, nNIP ~= comptes[nc].nip
+    pre 
+		nc in comptes.dom, 
+		nNIP ~= comptes[nc].nip
     post 
-	  comptes[nc]!modifierNIP(nNIP);
+		comptes[nc]!modifierNIP(nNIP);
 	  
   schema !bilanV(d: Date)
     pre 
@@ -294,12 +296,15 @@ interface
      pre
 	   ett = chNIP@ETAT,
 	   nCompte ~= null,
+	   nip >=0,
 	   (nCompte is NumCompte) in b.comptes.dom,
 	   b.comptes[nCompte is NumCompte].fermeture = null,
-	   encNIP(nip) ~= b.comptes[(nCompte is NumCompte)].nip
+	   encNIP(nip) ~= b.comptes[(nCompte is NumCompte)].nip,
+	   b.comptes[nCompte is NumCompte].nip ~= nip
+
 	 post
+	   
 	   b!ch_NIP((nCompte is NumCompte), nip),
-	   ~(b.comptes[(nCompte is NumCompte)].nip = nip),
 	   ett! = inactif@ETAT;
 		
   schema !insererCarte(nCarte : NumCompte , msg! : string)
