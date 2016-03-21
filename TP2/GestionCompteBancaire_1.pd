@@ -234,10 +234,10 @@ comptes[nc].ouverture, f}) ;
     pre 
 		d.j = dateExercice.j,
 		d.m = dateExercice.m,
-		soldeV = (+ over (for i::comptes.dom yield comptes[i].solde))
+		soldeG = (+ over (for i::comptes.dom yield comptes[i].solde))
 	post 
-		soldeV! = (+ over (for i::comptes.dom yield comptes[i].solde)),
-		soldeG! = soldeV,
+		soldeG! = (+ over (for i::comptes.dom yield comptes[i].solde)),
+		soldeV! = soldeG,
 		entrees! = 0,
 		sorties! = 0;
 
@@ -291,7 +291,7 @@ interface
 	   nCompte ~= null,
 	   (nCompte is NumCompte) in b.comptes.dom,
 	   b.comptes[nCompte is NumCompte].fermeture = null,
-	   (49 + montant) < b.comptes[nCompte is int].solde
+	   (minSolde + montant) < b.comptes[nCompte is int].solde
 	post
 	  ett! = inactif@ETAT,
 	  b!retraitC(nCompte is NumCompte, montant);
@@ -363,7 +363,7 @@ abstract
 
 schema !versExterieur(b1 : NumBanque, b2 : NumBanque, numCompte1 : NumCompte, numCompte2 : NumCompte, montant: int)
 	pre 
-		~(b1 = b2)
+		~(b1 = b2),
 		b1 in banques.dom,
 		b2 in banques.dom,
 		numCompte1 in banques[b1].comptes,
@@ -373,8 +373,7 @@ schema !versExterieur(b1 : NumBanque, b2 : NumBanque, numCompte1 : NumCompte, nu
 		banques[b1].comptes[numCompte1].solde - (montant + banques[b1].frais) >= minSolde,
 		0 < (banques[b1].frais + montant),
 		banques[b2].frais <= (banques[b2].comptes[numCompte2].solde + montant),
-		banques[b2].frais < montant,
-		~(b1 = b2)
+		banques[b2].frais < montant
 	post 
 		banques[b1]!versExterieur(numCompte1, montant),
 		banques[b2]!versInterieur(numCompte2, montant);
