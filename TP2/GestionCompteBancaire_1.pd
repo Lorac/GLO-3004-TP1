@@ -230,12 +230,13 @@ comptes[nc].ouverture, f}) ;
   schema !bilanV(d: Date)
     pre 
 		d.j = dateExercice.j,
-		d.m = dateExercice.m
+		d.m = dateExercice.m,
+		soldeV = (+ over (for i::comptes.dom yield comptes[i].solde))
 	post 
+		soldeV! = (+ over (for i::comptes.dom yield comptes[i].solde)),
+		soldeG! = soldeV,
 		entrees! = 0,
-		sorties! = 0,
-		//Il manque une condition ici
-		soldeG! = soldeV;
+		sorties! = 0;
 
   schema !versExterieur(nc : NumCompte, n : int)
 	pre 
