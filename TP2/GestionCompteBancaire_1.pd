@@ -20,6 +20,8 @@ const maxNum : int ^= 29999;
 
 class NumCompte ^= those j: int :- 1 <= j <= maxNum   ;
 
+class NumBanque ^= those j: int :- 1 <= j <= maxNum   ;
+
 class Jour ^= those j: int :- 1 <= j <= 31;
 class Mois ^= those m : int :- 1 <= m <= 12; 
 class An ^= those a : int :- 1900 <= a <= 20000; 
@@ -135,6 +137,7 @@ abstract
 interface
 
   function comptes ;
+  function frais;
 
  build{}
     post 
@@ -350,6 +353,34 @@ interface
 
 end;
 
+final class Transaction ^=
 
+abstract
+
+  var banques : map of (NumBanque -> Banque)
+  
+  interface
+
+schema !versExterieur(b1 : NumBanque, b2 : NumBanque, numCompte1 : NumCompte, numCompte2 : NumCompte, montant: int)
+	pre 
+		~(b1 = b2)
+		b1 in banques.dom,
+		b2 in banques.dom,
+		numCompte1 in banques[b1].comptes,
+		numCompte2 in banques[b2].comptes,
+		banques[b1].comptes[numCompte1].fermeture = null,
+		banques[b2].comptes[numCompte2].fermeture = null,
+		banques[b1].comptes[numCompte1].solde - (montant + banques[b1].frais) >= minSolde,
+		0 < (banques[b1].frais + montant),
+		banques[b2].frais <= (banques[b2].comptes[numCompte2].solde + montant),
+		banques[b2].frais < montant,
+		~(b1 = b2)
+	post 
+		banques[b1]!versExterieur(numCompte1, montant),
+		banques[b2]!versInterieur(numCompte2, montant);
+ build{}
+    post 
+		banques! = map  of (NumBanque -> Banque){}
+end;
 
 // End
