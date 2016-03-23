@@ -20,6 +20,8 @@ const maxNum : int ^= 29999;
 
 class NumCompte ^= those j: int :- 1 <= j <= maxNum   ;
 
+class NumBanque ^= those j: int :- 1 <= j <= maxNum   ;
+
 class Jour ^= those j: int :- 1 <= j <= 31;
 class Mois ^= those m : int :- 1 <= m <= 12; 
 class An ^= those a : int :- 1900 <= a <= 20000; 
@@ -117,6 +119,7 @@ abstract
 	  entrees : int,
 	  sorties : int,
 	  gains : int,
+	  frais : int,
 	  dateExercice : Date;
 	  
 
@@ -134,6 +137,7 @@ abstract
 interface
 
   function comptes ;
+  function frais;
 
  build{}
     post 
@@ -143,6 +147,7 @@ interface
 		entrees! = 0,
 		sorties! = 0,
 		gains! = 0,
+		frais!= 1,
 		dateExercice! = Date{1, 3, 1900};
 	
 
@@ -219,10 +224,46 @@ comptes[nc].ouverture, f}) ;
 
 
   schema !ch_NIP(nc :NumCompte , nNIP : int)
-    pre nc in comptes.dom, nNIP ~= comptes[nc].nip
+    pre 
+		nc in comptes.dom, 
+		nNIP ~= comptes[nc].nip
     post 
-	  comptes[nc]!modifierNIP(nNIP);
+		comptes[nc]!modifierNIP(nNIP);
+	  
+  schema !bilanV(d: Date)
+    pre 
+		d.j = dateExercice.j,
+		d.m = dateExercice.m,
+		soldeG = (+ over (for i::comptes.dom yield comptes[i].solde))
+	post 
+		soldeG! = (+ over (for i::comptes.dom yield comptes[i].solde)),
+		soldeV! = soldeG,
+		entrees! = 0,
+		sorties! = 0;
+
+  schema !versExterieur(nc : NumCompte, n : int)
+	pre 
+		nc in comptes.dom,
+		comptes[nc].solde - (n + frais) >= minSolde, 
+		comptes[nc].fermeture = null,
+		(n + frais) > 0
+	post 
+		soldeG! = soldeG - n +  frais ,
+		entrees! = entrees + frais,
+		sorties! = sorties + n,
+		comptes[nc]!retrait(n+frais);
   
+  schema !versInterieur(nc : NumCompte, n : int)
+	pre 
+		nc in comptes.dom,
+		comptes[nc].solde + n >=  frais, 
+		comptes[nc].fermeture = null,
+		(n - frais) > 0
+	post 
+		soldeG! = soldeG + n ,
+		entrees! = entrees + n ,
+		sorties! = sorties,
+		comptes[nc]!depot(n-frais);
 
 end;
 
@@ -250,7 +291,7 @@ interface
 	   nCompte ~= null,
 	   (nCompte is NumCompte) in b.comptes.dom,
 	   b.comptes[nCompte is NumCompte].fermeture = null,
-	   (49 + montant) < b.comptes[nCompte is int].solde
+	   (minSolde + montant) < b.comptes[nCompte is int].solde
 	post
 	  ett! = inactif@ETAT,
 	  b!retraitC(nCompte is NumCompte, montant);
@@ -259,12 +300,15 @@ interface
      pre
 	   ett = chNIP@ETAT,
 	   nCompte ~= null,
+	   nip >=0,
 	   (nCompte is NumCompte) in b.comptes.dom,
 	   b.comptes[nCompte is NumCompte].fermeture = null,
-	   encNIP(nip) ~= b.comptes[(nCompte is NumCompte)].nip
+	   encNIP(nip) ~= b.comptes[(nCompte is NumCompte)].nip,
+	   b.comptes[nCompte is NumCompte].nip ~= nip
+
 	 post
+	   
 	   b!ch_NIP((nCompte is NumCompte), nip),
-	   ~(b.comptes[(nCompte is NumCompte)].nip = nip),
 	   ett! = inactif@ETAT;
 		
   schema !insererCarte(nCarte : NumCompte , msg! : string)
@@ -299,7 +343,8 @@ interface
                     [bout =  nip@BOUTON] :  chNIP@ETAT
                   ) ;
 
-  
+
+	
   build{!b:Banque}
 	
     post 
@@ -308,6 +353,33 @@ interface
 
 end;
 
+final class Transaction ^=
 
+abstract
+
+  var banques : map of (NumBanque -> Banque)
+  
+  interface
+
+schema !versExterieur(b1 : NumBanque, b2 : NumBanque, numCompte1 : NumCompte, numCompte2 : NumCompte, montant: int)
+	pre 
+		~(b1 = b2),
+		b1 in banques.dom,
+		b2 in banques.dom,
+		numCompte1 in banques[b1].comptes,
+		numCompte2 in banques[b2].comptes,
+		banques[b1].comptes[numCompte1].fermeture = null,
+		banques[b2].comptes[numCompte2].fermeture = null,
+		banques[b1].comptes[numCompte1].solde - (montant + banques[b1].frais) >= minSolde,
+		0 < (banques[b1].frais + montant),
+		banques[b2].frais <= (banques[b2].comptes[numCompte2].solde + montant),
+		banques[b2].frais < montant
+	post 
+		banques[b1]!versExterieur(numCompte1, montant),
+		banques[b2]!versInterieur(numCompte2, montant);
+ build{}
+    post 
+		banques! = map  of (NumBanque -> Banque){}
+end;
 
 // End
