@@ -1,22 +1,20 @@
 package ca.ulaval.glo3004.etape3;
 
+import ca.ulaval.glo3004.etape3.exception.DateInvalide;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class CompteTest {
 
     @Test
-    public void givenValidCompte_whenCreatingCompte_thenValidCompte() {
+    public void givenValidCompte_whenCreatingCompte_thenValidCompte() throws Exception {
         //given
         int solde = 100;
         int nip = 1234;
         Date ouverture = null;
-        try {
-            ouverture = new Date(2, 2, 2016);
-        } catch (Exception e) {
+        ouverture = new Date(2, 2, 2016);
 
-        }
         //when
         Compte compte = new Compte(solde, nip, ouverture, null);
 
@@ -29,18 +27,15 @@ public class CompteTest {
     }
 
     @Test
-    public void givenValidCompteWithFermeture_whenCreatingCompte_thenValidCompte() {
+    public void givenValidCompteWithFermeture_whenCreatingCompte_thenValidCompte() throws Exception {
         //given
         int solde = 100;
         int nip = 1234;
         Date ouverture = null;
         Date fermeture = null;
-        try {
-            ouverture = new Date(2, 2, 2016);
-            fermeture = new Date(3, 3, 2016);
-        } catch (Exception e) {
+        ouverture = new Date(2, 2, 2016);
+        fermeture = new Date(3, 3, 2016);
 
-        }
         //when
         Compte compte = new Compte(solde, nip, ouverture, fermeture);
 
@@ -53,18 +48,15 @@ public class CompteTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void givenLowSolde_whenCreatingCompte_thenShouldFail() {
+    public void givenLowSolde_whenCreatingCompte_thenShouldFail() throws Exception {
         //given
         int solde = 10;
         int nip = 1234;
         Date ouverture = null;
         Date fermeture = null;
-        try {
-            ouverture = new Date(2, 2, 2016);
-            fermeture = new Date(3, 3, 2016);
-        } catch (Exception e) {
+        ouverture = new Date(2, 2, 2016);
+        fermeture = new Date(3, 3, 2016);
 
-        }
         //when
         Compte compte = new Compte(solde, nip, ouverture, fermeture);
     }

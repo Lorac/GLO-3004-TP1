@@ -15,8 +15,8 @@ public class Date {
     private final int annee;
 
     public Date(int jour, int mois, int annee) throws DateInvalide {
-        if (isLeapYear(annee) && mois == 2  && jour > 29){
-            throw new DateInvalide();
+        if (isLeapYear(annee) && mois == 2 && jour > 29) {
+            throw new DateInvalide("Febuary month can't have 29 days");
         }
         try {
             LocalDate.of(annee, mois, jour);
@@ -24,8 +24,14 @@ public class Date {
             this.mois = mois;
             this.annee = annee;
         } catch (DateTimeException e) {
-            throw new DateInvalide();
+            throw new DateInvalide(e);
         }
+    }
+
+    private static boolean isLeapYear(int year) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, year);
+        return cal.getActualMaximum(DAY_OF_YEAR) > 365;
     }
 
     public int getJour() {
@@ -38,11 +44,5 @@ public class Date {
 
     public int getAnnee() {
         return annee;
-    }
-
-    private static boolean isLeapYear(int year) {
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.YEAR, year);
-        return cal.getActualMaximum(DAY_OF_YEAR) > 365;
     }
 }
