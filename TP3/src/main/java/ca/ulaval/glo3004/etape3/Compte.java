@@ -11,8 +11,8 @@ public class Compte {
     private final int minSolde = 50;
 
 
-    public Compte(int solde, int nip, Date ouverture, Date fermeture){
-        if (solde < minSolde && fermeture == null){
+    public Compte(int solde, int nip, Date ouverture, Date fermeture) {
+        if (solde < minSolde && fermeture == null) {
             throw new IllegalArgumentException();
         }
         this.solde = solde;
@@ -23,8 +23,8 @@ public class Compte {
         assert isValid();
     }
 
-    public int withdrawal(int amount){
-        if ( amount <= 0){
+    public int withdrawal(int amount) {
+        if (amount <= 0) {
             throw new IllegalArgumentException();
         }
         this.solde -= amount;
@@ -32,16 +32,16 @@ public class Compte {
         return solde;
     }
 
-    public void deposit(int amount){
-        if ( amount <= 0){
+    public void deposit(int amount) {
+        if (amount <= 0) {
             throw new IllegalArgumentException();
         }
         this.solde += amount;
         assert isValid();
     }
 
-    public void liquidDeposit(int amount){
-        if (amount <= 0 || this.liquide + amount > this.maxLiquide){
+    public void liquidDeposit(int amount) {
+        if (amount <= 0 || this.liquide + amount > this.maxLiquide) {
             throw new IllegalArgumentException();
         }
         this.liquide += amount;
@@ -49,13 +49,13 @@ public class Compte {
         assert isValid();
     }
 
-    public void resetLiquid(){
+    public void resetLiquid() {
         this.liquide = 0;
         assert isValid();
     }
 
-    public void modifyPin(int newPin){
-        if (this.nip == newPin){
+    public void modifyPin(int newPin) {
+        if (this.nip == newPin) {
             throw new IllegalArgumentException();
         }
         this.nip = newPin;
@@ -79,6 +79,10 @@ public class Compte {
         return fermeture;
     }
 
+    public void setFermeture(Date fermeture) {
+        this.fermeture = fermeture;
+    }
+
     public int getLiquide() {
         return liquide;
     }
@@ -88,7 +92,7 @@ public class Compte {
         assert isValid();
     }
 
-    private boolean isValid(){
+    private boolean isValid() {
         return (this.liquide <= maxLiquide && (this.solde >= minSolde || this.fermeture != null));
     }
 }
