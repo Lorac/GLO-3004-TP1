@@ -12,7 +12,7 @@ public class Compte {
 
 
     public Compte(int solde, int nip, Date ouverture, Date fermeture){
-        if (solde < minSolde){
+        if (solde < minSolde && fermeture == null){
             throw new IllegalArgumentException();
         }
         this.solde = solde;
@@ -20,6 +20,7 @@ public class Compte {
         this.ouverture = ouverture;
         this.fermeture = fermeture;
         this.liquide = 0;
+        assert isValid();
     }
 
     public int withdrawal(int amount){
@@ -27,6 +28,7 @@ public class Compte {
             throw new IllegalArgumentException();
         }
         this.solde -= amount;
+        assert isValid();
         return solde;
     }
 
@@ -35,6 +37,7 @@ public class Compte {
             throw new IllegalArgumentException();
         }
         this.solde += amount;
+        assert isValid();
     }
 
     public void liquidDeposit(int amount){
@@ -43,10 +46,12 @@ public class Compte {
         }
         this.liquide += amount;
         this.solde += amount;
+        assert isValid();
     }
 
     public void resetLiquid(){
         this.liquide = 0;
+        assert isValid();
     }
 
     public void modifyPin(int newPin){
@@ -54,6 +59,7 @@ public class Compte {
             throw new IllegalArgumentException();
         }
         this.nip = newPin;
+        assert isValid();
     }
 
     public int getSolde() {
@@ -79,5 +85,10 @@ public class Compte {
 
     public void setLiquide(int liquide) {
         this.liquide = liquide;
+        assert isValid();
+    }
+
+    private boolean isValid(){
+        return (this.liquide <= maxLiquide && (this.solde >= minSolde || this.fermeture != null));
     }
 }

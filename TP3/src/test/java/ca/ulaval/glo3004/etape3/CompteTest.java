@@ -61,7 +61,6 @@ public class CompteTest {
         Date fermeture = null;
         try {
             ouverture = new Date(2, 2, 2016);
-            fermeture = new Date(3, 3, 2016);
         } catch (Exception e) {
 
         }
