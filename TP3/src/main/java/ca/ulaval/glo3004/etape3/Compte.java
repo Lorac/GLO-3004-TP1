@@ -7,12 +7,9 @@ public class Compte {
     private Date ouverture;
     private Date fermeture;
     private int liquide;
-    private final int maxLiquide = 1000;
-    private final int minSolde = 50;
-
 
     public Compte(int solde, int nip, Date ouverture, Date fermeture) {
-        if (solde < minSolde && fermeture == null) {
+        if (solde < Constants.minSolde && fermeture == null) {
             throw new IllegalArgumentException();
         }
         this.solde = solde;
@@ -20,46 +17,46 @@ public class Compte {
         this.ouverture = ouverture;
         this.fermeture = fermeture;
         this.liquide = 0;
-        assert isValid();
+        assert estValide();
     }
 
-    public int withdrawal(int amount) {
+    public int retrait(int amount) {
         if (amount <= 0) {
             throw new IllegalArgumentException();
         }
         this.solde -= amount;
-        assert isValid();
+        assert estValide();
         return solde;
     }
 
-    public void deposit(int amount) {
+    public void depot(int amount) {
         if (amount <= 0) {
             throw new IllegalArgumentException();
         }
         this.solde += amount;
-        assert isValid();
+        assert estValide();
     }
 
-    public void liquidDeposit(int amount) {
-        if (amount <= 0 || this.liquide + amount > this.maxLiquide) {
+    public void depotLiquide(int amount) {
+        if (amount <= 0 || this.liquide + amount > Constants.maxLiquide) {
             throw new IllegalArgumentException();
         }
         this.liquide += amount;
         this.solde += amount;
-        assert isValid();
+        assert estValide();
     }
 
-    public void resetLiquid() {
+    public void miseAZeroLiquide() {
         this.liquide = 0;
-        assert isValid();
+        assert estValide();
     }
 
-    public void modifyPin(int newPin) {
-        if (this.nip == newPin) {
+    public void modifierNIP(int nNIP) {
+        if (this.nip == nNIP) {
             throw new IllegalArgumentException();
         }
-        this.nip = newPin;
-        assert isValid();
+        this.nip = nNIP;
+        assert estValide();
     }
 
     public int getSolde() {
@@ -89,10 +86,10 @@ public class Compte {
 
     public void setLiquide(int liquide) {
         this.liquide = liquide;
-        assert isValid();
+        assert estValide();
     }
 
-    private boolean isValid() {
-        return (this.liquide <= maxLiquide && (this.solde >= minSolde || this.fermeture != null));
+    private boolean estValide() {
+        return (this.liquide <= Constants.maxLiquide && (this.solde >= Constants.minSolde || this.fermeture != null));
     }
 }

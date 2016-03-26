@@ -66,7 +66,7 @@ public class CompteTest {
         int soldeBefore = compte.getSolde();
 
         //when
-        compte.withdrawal(100);
+        compte.retrait(100);
 
         assertEquals(soldeBefore - 100, compte.getSolde());
     }
@@ -77,7 +77,7 @@ public class CompteTest {
         Compte compte = createValidCompte();
 
         //when
-        compte.withdrawal(-100);
+        compte.retrait(-100);
     }
 
     @Test
@@ -87,7 +87,7 @@ public class CompteTest {
         int soldeBefore = compte.getSolde();
 
         //when
-        compte.deposit(100);
+        compte.depot(100);
 
         assertEquals(soldeBefore + 100, compte.getSolde());
     }
@@ -98,7 +98,7 @@ public class CompteTest {
         Compte compte = createValidCompte();
 
         //when
-        compte.deposit(-100);
+        compte.depot(-100);
     }
 
     @Test
@@ -109,7 +109,7 @@ public class CompteTest {
         int liquidBefore = compte.getLiquide();
 
         //when
-        compte.liquidDeposit(100);
+        compte.depotLiquide(100);
         //then
         assertEquals(soldeBefore + 100, compte.getSolde());
         assertEquals(liquidBefore + 100, compte.getLiquide());
@@ -121,7 +121,7 @@ public class CompteTest {
         Compte compte = createValidCompte();
 
         //when
-        compte.liquidDeposit(-100);
+        compte.depotLiquide(-100);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -130,7 +130,7 @@ public class CompteTest {
         Compte compte = createValidCompte();
 
         //when
-        compte.liquidDeposit(10000);
+        compte.depotLiquide(10000);
     }
 
     @Test
@@ -140,7 +140,7 @@ public class CompteTest {
         compte.setLiquide(100);
 
         //when
-        compte.resetLiquid();
+        compte.miseAZeroLiquide();
         //then
         assertEquals(0, compte.getLiquide());
     }
@@ -151,7 +151,7 @@ public class CompteTest {
         Compte compte = createValidCompte();
 
         //when
-        compte.modifyPin(2222);
+        compte.modifierNIP(2222);
         //then
         assertEquals(2222, compte.getNip());
     }
@@ -162,7 +162,7 @@ public class CompteTest {
         Compte compte = createValidCompte();
 
         //when
-        compte.modifyPin(1234);
+        compte.modifierNIP(1234);
     }
 
 

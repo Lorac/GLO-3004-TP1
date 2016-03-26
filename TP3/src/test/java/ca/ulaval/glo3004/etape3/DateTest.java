@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 
 public class DateTest {
     @Test
-    public void givenValidDate_whenConstructingDate_thenConstructedDateIsValid() throws DateInvalide{
+    public void givenValidDate_whenConstructingDate_thenConstructedDateIsValid() throws DateInvalide {
         //given
         int jour = 10;
         int mois = 9;
@@ -20,8 +20,8 @@ public class DateTest {
         assertEquals(date.getAnnee(), annee);
     }
 
-    @Test(expected=DateInvalide.class)
-    public void givenInvalidDate_whenConstructingDate_thenThrowsDateInvalide() throws DateInvalide{
+    @Test(expected = DateInvalide.class)
+    public void givenInvalidDate_whenConstructingDate_thenThrowsDateInvalide() throws DateInvalide {
         //given
         int jour = 32;
         int mois = 9;
@@ -32,8 +32,8 @@ public class DateTest {
 
     }
 
-    @Test(expected=DateInvalide.class)
-    public void givenInvalidLeapDate_whenConstructingDate_thenThrowsDateInvalide() throws DateInvalide{
+    @Test(expected = DateInvalide.class)
+    public void givenInvalidLeapDate_whenConstructingDate_thenThrowsDateInvalide() throws DateInvalide {
         //given
         int jour = 30;
         int mois = 2;
