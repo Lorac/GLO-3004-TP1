@@ -63,8 +63,10 @@ public class Banque {
     }
 
     public void retraitC(NumCompte numeroCompte, int montant) {
-        if (!comptes.containsKey(numeroCompte) || montant <= 0 ||
-                comptes.get(numeroCompte).getSolde() - montant < Constants.minSolde) {
+        if (!comptes.containsKey(numeroCompte) ||
+                montant <= 0 ||
+                comptes.get(numeroCompte).getSolde() - montant < Constants.minSolde ||
+                comptes.get(numeroCompte).estFerme()) {
             throw new IllegalArgumentException();
         }
         soldeG -= montant;
@@ -74,7 +76,7 @@ public class Banque {
     }
 
     public void depotC(NumCompte numeroCompte, int montant) {
-        if (!comptes.containsKey(numeroCompte) || montant <= 0) {
+        if (!comptes.containsKey(numeroCompte) || montant <= 0 || comptes.get(numeroCompte).estFerme()) {
             throw new IllegalArgumentException();
         }
         soldeG += montant;
@@ -85,7 +87,8 @@ public class Banque {
 
     public void depotLC(NumCompte numeroCompte, int montant) {
         if (!comptes.containsKey(numeroCompte) || montant <= 0 ||
-                comptes.get(numeroCompte).getLiquide() + montant > Constants.maxLiquide) {
+                comptes.get(numeroCompte).getLiquide() + montant > Constants.maxLiquide ||
+                comptes.get(numeroCompte).estFerme()) {
             throw new IllegalArgumentException();
         }
         soldeG += montant;
@@ -96,7 +99,9 @@ public class Banque {
 
     public void virementC(NumCompte numeroCompte1, NumCompte numeroCompte2, int montant) {
         if (!comptes.containsKey(numeroCompte1) || !comptes.containsKey(numeroCompte2) || montant <= 0 ||
-                comptes.get(numeroCompte1).getSolde() - montant < Constants.minSolde) {
+                comptes.get(numeroCompte1).getSolde() - montant < Constants.minSolde ||
+                comptes.get(numeroCompte1).estFerme() ||
+                comptes.get(numeroCompte2).estFerme()) {
             throw new IllegalArgumentException();
         }
         comptes.get(numeroCompte1).retrait(montant);
@@ -105,7 +110,7 @@ public class Banque {
     }
 
     public void chNIP(NumCompte numeroCompte, int nNIP) {
-        if (!comptes.containsKey(numeroCompte) || comptes.get(numeroCompte).getNip() == nNIP) {
+        if (!comptes.containsKey(numeroCompte) || comptes.get(numeroCompte).getNip() == nNIP || comptes.get(numeroCompte).estFerme()) {
             throw new IllegalArgumentException();
         }
         comptes.get(numeroCompte).modifierNIP(nNIP);
