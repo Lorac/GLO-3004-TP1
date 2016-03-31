@@ -3,6 +3,7 @@ package ca.ulaval.glo3004.etape3;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CompteTest {
 
@@ -22,7 +23,7 @@ public class CompteTest {
         assertEquals(0, compte.getLiquide());
         assertEquals(nip, compte.getNip());
         assertEquals(ouverture, compte.getOuverture());
-        assertEquals(null, compte.getFermeture());
+        assertTrue(compte.estOuvert());
     }
 
     @Test
@@ -60,7 +61,7 @@ public class CompteTest {
     }
 
     @Test
-    public void givenValidCompte_whenWithdrawing_thenSoldeIsUpdated() {
+    public void givenValidCompte_whenWithdrawing_thenSoldeIsUpdated() throws Exception {
         //given
         Compte compte = createValidCompte();
         int soldeBefore = compte.getSolde();
@@ -72,7 +73,7 @@ public class CompteTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void givenValidCompte_whenWithdrawingWithNegative_thenThrowsError() {
+    public void givenValidCompte_whenWithdrawingWithNegative_thenThrowsError() throws Exception {
         //given
         Compte compte = createValidCompte();
 
@@ -81,7 +82,7 @@ public class CompteTest {
     }
 
     @Test
-    public void givenValidCompte_whenDeposit_thenSoldeIsUpdated() {
+    public void givenValidCompte_whenDeposit_thenSoldeIsUpdated() throws Exception {
         //given
         Compte compte = createValidCompte();
         int soldeBefore = compte.getSolde();
@@ -93,7 +94,7 @@ public class CompteTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void givenValidCompte_whenDepositWithNegative_thenThrowsError() {
+    public void givenValidCompte_whenDepositWithNegative_thenThrowsError() throws Exception {
         //given
         Compte compte = createValidCompte();
 
@@ -102,7 +103,7 @@ public class CompteTest {
     }
 
     @Test
-    public void givenValidCompte_whenLiquidDeposit_thenSoldeAndLiquideIsUpdated() {
+    public void givenValidCompte_whenLiquidDeposit_thenSoldeAndLiquideIsUpdated() throws Exception {
         //given
         Compte compte = createValidCompte();
         int soldeBefore = compte.getSolde();
@@ -116,7 +117,7 @@ public class CompteTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void givenValidCompte_whenLiquidDepositWithNegative_thenThrowsError() {
+    public void givenValidCompte_whenLiquidDepositWithNegative_thenThrowsError() throws Exception {
         //given
         Compte compte = createValidCompte();
 
@@ -125,7 +126,7 @@ public class CompteTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void givenValidCompte_whenLiquidDepositWithMaximumLiquid_thenThrowsError() {
+    public void givenValidCompte_whenLiquidDepositWithMaximumLiquid_thenThrowsError() throws Exception {
         //given
         Compte compte = createValidCompte();
 
@@ -134,7 +135,7 @@ public class CompteTest {
     }
 
     @Test
-    public void givenValidCompte_whenReset_thenLiquidIsReset() {
+    public void givenValidCompte_whenReset_thenLiquidIsReset() throws Exception {
         //given
         Compte compte = createValidCompte();
         compte.setLiquide(100);
@@ -146,7 +147,7 @@ public class CompteTest {
     }
 
     @Test
-    public void givenValidCompte_whenModifyPin_thenPinIsChanged() {
+    public void givenValidCompte_whenModifyPin_thenPinIsChanged() throws Exception {
         //given
         Compte compte = createValidCompte();
 
@@ -157,7 +158,7 @@ public class CompteTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void givenValidCompte_whenModifyPinWithSamePin_thenThrowException() {
+    public void givenValidCompte_whenModifyPinWithSamePin_thenThrowException() throws Exception {
         //given
         Compte compte = createValidCompte();
 
@@ -166,16 +167,13 @@ public class CompteTest {
     }
 
 
-    private Compte createValidCompte() {
+    private Compte createValidCompte() throws Exception {
         int solde = 1000;
         int nip = 1234;
         Date ouverture = null;
         Date fermeture = null;
-        try {
-            ouverture = new Date(2, 2, 2016);
-        } catch (Exception e) {
+        ouverture = new Date(2, 2, 2016);
 
-        }
         return new Compte(solde, nip, ouverture, fermeture);
     }
 

@@ -75,7 +75,7 @@ public class BanqueTest {
         //when
         banque.fermerCompte(VALIDNUMCOMPTE, date);
         //then
-        assertEquals(date, banque.getComptes().get(VALIDNUMCOMPTE).getFermeture());
+        assertTrue(banque.getComptes().get(VALIDNUMCOMPTE).estFerme());
     }
 
     @Test(expected = IllegalArgumentException.class)

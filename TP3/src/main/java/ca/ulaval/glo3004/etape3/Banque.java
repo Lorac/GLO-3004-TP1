@@ -37,7 +37,7 @@ public class Banque {
 
     public void fermerCompte(NumCompte numeroCompte, Date fermeture) {
         if (!comptes.containsKey(numeroCompte) || comptes.get(numeroCompte).getSolde() != Constants.minSolde ||
-                comptes.get(numeroCompte).getFermeture() != null) {
+                comptes.get(numeroCompte).estFerme()) {
             throw new IllegalArgumentException();
         }
         comptes.get(numeroCompte).setFermeture(fermeture);
@@ -46,7 +46,7 @@ public class Banque {
 
     public void supprimerCompte(NumCompte numeroCompte, Date date) {
         if (!comptes.containsKey(numeroCompte) || comptes.get(numeroCompte).getSolde() != Constants.minSolde ||
-                comptes.get(numeroCompte).getFermeture() == null) {
+                comptes.get(numeroCompte).estOuvert()) {
             throw new IllegalArgumentException();
         }
         Date fermeture = comptes.get(numeroCompte).getFermeture();
@@ -122,7 +122,7 @@ public class Banque {
 
     public void versExterieur(NumCompte numeroCompte, int montant) {
         if (!comptes.containsKey(numeroCompte) || comptes.get(numeroCompte).getSolde() - (montant + frais) < Constants.minSolde ||
-                comptes.get(numeroCompte).getFermeture() != null || (montant + frais) <= 0) {
+                comptes.get(numeroCompte).estFerme() || (montant + frais) <= 0) {
             throw new IllegalArgumentException();
         }
         soldeG = soldeG - montant + frais;
@@ -134,7 +134,7 @@ public class Banque {
 
     public void versInterieur(NumCompte numeroCompte, int montant) {
         if (!comptes.containsKey(numeroCompte) || comptes.get(numeroCompte).getSolde() + montant < frais ||
-                comptes.get(numeroCompte).getFermeture() != null || (montant - frais) <= 0) {
+                comptes.get(numeroCompte).estFerme() || (montant - frais) <= 0) {
             throw new IllegalArgumentException();
         }
         soldeG += montant;

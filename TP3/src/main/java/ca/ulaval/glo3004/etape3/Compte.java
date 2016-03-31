@@ -71,13 +71,20 @@ public class Compte {
         return ouverture;
     }
 
-
     public Date getFermeture() {
         return fermeture;
     }
 
     public void setFermeture(Date fermeture) {
         this.fermeture = fermeture;
+    }
+
+    public boolean estOuvert() {
+        return fermeture == null;
+    }
+
+    public boolean estFerme() {
+        return fermeture != null;
     }
 
     public int getLiquide() {
