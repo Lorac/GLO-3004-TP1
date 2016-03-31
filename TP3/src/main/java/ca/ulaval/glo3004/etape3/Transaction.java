@@ -33,7 +33,7 @@ public class Transaction {
         assert (compteDest.estOuvert()) : "Le compte destination est fermé";
 
         assert (compteSource.getSolde() - (montant + banqueSource.getFrais()) >= Constants.minSolde) : "Le solde du compte source n'est " +
-                "pas assez élévé";
+                "pas assez élevé";
 
         assert (0 < banqueSource.getFrais() + montant);
 
