@@ -1,6 +1,7 @@
 package ca.ulaval.glo3004.etape3;
 
 import ca.ulaval.glo3004.etape3.exception.DateInvalide;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -12,11 +13,15 @@ public class BanqueTest {
     private static final NumCompte VALIDNUMCOMPTE2 = new NumCompte(2);
     private static final int VALIDBALANCE = 10000;
     private static final int INVALIDBALANCE = -40;
+    private Banque banque;
+
+    @Before
+    public void setup() throws Exception {
+        banque = new Banque();
+    }
 
     @Test
     public void givenNoArguments_WhenCreatingBanque_ThenValidBanque() throws DateInvalide {
-        //when
-        Banque banque = new Banque();
         //then
         assertEquals(new HashMap<NumCompte, Compte>(), banque.getComptes());
         assertEquals(200, banque.getFrais());
@@ -24,8 +29,6 @@ public class BanqueTest {
 
     @Test
     public void givenCorrectArguments_WhenOpeningCompte_ThenValidCompte() throws Exception {
-        //given
-        Banque banque = new Banque();
         Date date = new Date(1, 1, 1990);
         //when
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, date);
@@ -37,8 +40,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenIncorrectBalance_WhenOpeningCompte_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         Date date = new Date(1, 1, 1990);
         //when
         banque.ouvrirCompte(INVALIDBALANCE, VALIDNUMCOMPTE, date);
@@ -46,8 +47,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueAtCapacity_WhenOpeningCompte_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         for (int i = 0; i < Constants.maxNum; i++) {
             banque.getComptes().put(new NumCompte(i), null);
         }
@@ -58,8 +57,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithACompte_WhenOpeningCompteWithSameNumber_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         Date date = new Date(1, 1, 1990);
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, date);
         //when
@@ -68,8 +65,6 @@ public class BanqueTest {
 
     @Test
     public void givenABanqueWithACompte_WhenClosingCompteWithSameNumber_ThenCompteIsClosed() throws Exception {
-        //given
-        Banque banque = new Banque();
         Date date = new Date(1, 1, 1990);
         banque.ouvrirCompte(Constants.minSolde, VALIDNUMCOMPTE, date);
         //when
@@ -80,8 +75,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithACompteWithHighBalance_WhenClosingCompte_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         Date date = new Date(1, 1, 1990);
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, date);
         //when
@@ -90,8 +83,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithNoCompte_WhenClosingCompte_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         Date date = new Date(1, 1, 1990);
         //when
         banque.fermerCompte(VALIDNUMCOMPTE, date);
@@ -99,8 +90,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithCompte_WhenClosingCompteWithNullClosingDate_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         Date date = new Date(1, 1, 1990);
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, date);
         //when
@@ -109,8 +98,6 @@ public class BanqueTest {
 
     @Test
     public void givenABanqueWithAClosedCompte_WhenDeletingCompte_ThenCompteIsDeleted() throws Exception {
-        //given
-        Banque banque = new Banque();
         Date date = new Date(1, 1, 1990);
         banque.ouvrirCompte(Constants.minSolde, VALIDNUMCOMPTE, date);
         banque.fermerCompte(VALIDNUMCOMPTE, date);
@@ -123,8 +110,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithNoCompte_WhenDeletingCompte_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         Date date = new Date(1, 1, 1990);
         //when
         banque.supprimerCompte(VALIDNUMCOMPTE, date);
@@ -144,8 +129,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithAnOpenCompte_WhenDeletingCompte_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         Date date = new Date(1, 1, 1990);
         banque.ouvrirCompte(Constants.minSolde, VALIDNUMCOMPTE, date);
         //when
@@ -155,8 +138,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithAClosedCompte_WhenDeletingCompteTooSoonByYear_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         Date date = new Date(1, 1, 1990);
         banque.ouvrirCompte(Constants.minSolde, VALIDNUMCOMPTE, date);
         banque.fermerCompte(VALIDNUMCOMPTE, date);
@@ -167,8 +148,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithAClosedCompte_WhenDeletingCompteTooSoonByMonth_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         Date date = new Date(1, 2, 1990);
         banque.ouvrirCompte(Constants.minSolde, VALIDNUMCOMPTE, date);
         banque.fermerCompte(VALIDNUMCOMPTE, date);
@@ -179,8 +158,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithAClosedCompte_WhenDeletingCompteTooSoonByDay_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         Date date = new Date(2, 1, 1990);
         banque.ouvrirCompte(Constants.minSolde, VALIDNUMCOMPTE, date);
         banque.fermerCompte(VALIDNUMCOMPTE, date);
@@ -191,8 +168,6 @@ public class BanqueTest {
 
     @Test
     public void givenABanqueWithACompte_WhenWithdrawingFromCompte_ThenCompteIsWithdrawnFrom() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         int amount = 50;
@@ -203,8 +178,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithACompte_WhenWithdrawingBadAmountFromCompte_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         int amount = 0;
@@ -213,8 +186,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithNoCompte_WhenWithdrawingFromCompte_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         //when
         int amount = 50;
         banque.retraitC(VALIDNUMCOMPTE, amount);
@@ -222,8 +193,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithInsufficientBalanceCompte_WhenWithdrawingFromCompte_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         int amount = VALIDBALANCE;
@@ -232,8 +201,6 @@ public class BanqueTest {
 
     @Test
     public void givenABanqueWithACompte_WhenDepositingInCompte_ThenDepositIsCompleted() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         int amount = 50;
@@ -244,8 +211,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithACompte_WhenDepositingBadAmountInCompte_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         int amount = 0;
@@ -254,8 +219,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithNoCompte_WhenDepositingInCompte_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         //when
         int amount = 50;
         banque.depotC(VALIDNUMCOMPTE, amount);
@@ -263,8 +226,6 @@ public class BanqueTest {
 
     @Test
     public void givenABanqueWithACompte_WhenDepositingLiquidInCompte_ThenDepositIsCompleted() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         int amount = 50;
@@ -276,8 +237,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithACompte_WhenDepositingBadLiquidAmountInCompte_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         int amount = 0;
@@ -286,8 +245,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithACompte_WhenDepositingTooMuchLiquidAmountInCompte_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         int amount = Constants.maxLiquide + 1;
@@ -297,8 +254,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithNoCompte_WhenDepositingLiquidInCompte_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         //when
         int amount = 50;
         banque.depotLC(VALIDNUMCOMPTE, amount);
@@ -306,8 +261,6 @@ public class BanqueTest {
 
     @Test
     public void givenABanqueWithTwoComptes_WhenTransferingValidAmount_ThenTransferIsCompleted() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE2, new Date(2, 1, 1990));
         //when
@@ -320,8 +273,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithOneCompte_WhenTransferingAmountToInvalidCompte_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         int amount = 50;
@@ -330,8 +281,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithOneCompte_WhenTransferingAmountFromInvalidCompte_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE2, new Date(2, 1, 1990));
         //when
         int amount = 50;
@@ -340,8 +289,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithTwoComptes_WhenTransferingInvalidAmount_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE2, new Date(2, 1, 1990));
         //when
@@ -351,8 +298,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithTwoComptes_WhenTransferingTooMuch_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE2, new Date(2, 1, 1990));
         //when
@@ -362,8 +307,6 @@ public class BanqueTest {
 
     @Test
     public void givenABanqueWithACompte_WhenChangingNIP_ThenNIPIsChanged() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         int NIP = 50;
@@ -374,8 +317,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithNoCompte_WhenChangingNIP_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         //when
         int NIP = 50;
         banque.chNIP(VALIDNUMCOMPTE, NIP);
@@ -383,8 +324,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithACompte_WhenChangingNIPToSameNIP_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         int NIP = 50;
@@ -394,8 +333,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanque_WhenDoingTheAssessementOnWrongDay_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         //when
         Date date = new Date(2, 3, 2000);
         banque.bilanV(date);
@@ -412,8 +349,6 @@ public class BanqueTest {
 
     @Test
     public void givenABanque_WhenDoingTheAssessement_ThenDoesNotThrowAnError() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         Date date = new Date(1, 3, 2000);
@@ -422,8 +357,6 @@ public class BanqueTest {
 
     @Test
     public void givenABanqueWithACompte_WhenTransferringToOutside_ThenComptePaysFeesAndAmount() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         int amount = 250;
@@ -434,8 +367,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithNoCompte_WhenTransferringToOutside_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         //when
         int amount = 250;
         banque.versExterieur(VALIDNUMCOMPTE, amount);
@@ -443,8 +374,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithACompte_WhenTransferringTooMuchToOutside_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         int amount = VALIDBALANCE - Constants.minSolde;
@@ -453,8 +382,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithAClosedCompte_WhenTransferringToOutside_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         banque.fermerCompte(VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
@@ -464,8 +391,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithACompte_WhenTransferringTooLittleOutside_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         int amount = -201;
@@ -474,8 +399,6 @@ public class BanqueTest {
 
     @Test
     public void givenABanqueWithACompte_WhenTransferringToInside_ThenCompteGetsAmountMinusFees() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         int amount = 250;
@@ -486,8 +409,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithNoCompte_WhenTransferringToInside_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         //when
         int amount = 250;
         banque.versInterieur(VALIDNUMCOMPTE, amount);
@@ -495,8 +416,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithACompte_WhenFeesAreGreaterThanResultingBalanceOnInsideTransfer_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(Constants.minSolde, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         int amount = 10;
@@ -505,8 +424,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithAClosedCompte_WhenTransferringToInside_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         banque.fermerCompte(VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
@@ -516,8 +433,6 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueWithACompte_WhenTransferringTooLittleInside_ThenThrowsError() throws Exception {
-        //given
-        Banque banque = new Banque();
         banque.ouvrirCompte(VALIDBALANCE, VALIDNUMCOMPTE, new Date(2, 1, 1990));
         //when
         int amount = 200;
