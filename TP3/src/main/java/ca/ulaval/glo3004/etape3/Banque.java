@@ -32,6 +32,8 @@ public class Banque {
             throw new IllegalArgumentException();
         }
         comptes.put(numeroCompte, new Compte(soldeInitial, 0, ouverture, null));
+        soldeG += soldeInitial;
+        entrees += soldeInitial;
         assert estValide();
     }
 
