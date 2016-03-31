@@ -1,12 +1,10 @@
 package ca.ulaval.glo3004.etape3;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class Transaction {
 
-    private Map<NumBanque, Banque> banques = new HashMap<>();
-
+    private Map<NumBanque, Banque> banques;
 
     public Transaction(Map<NumBanque, Banque> banques) {
         this.banques = banques;
@@ -20,14 +18,14 @@ public class Transaction {
         Banque banqueSource = banques.get(numBanqueSource);
         Banque banqueDest = banques.get(numBanqueDest);
 
-        HashMap<NumCompte, Compte> comptes = banqueSource.getComptes();
-        HashMap<NumCompte, Compte> comptes2 = banqueDest.getComptes();
+        Map<NumCompte, Compte> comptesSource = banqueSource.getComptes();
+        Map<NumCompte, Compte> comptesDest = banqueDest.getComptes();
 
-        assert (comptes.containsKey(numCompteSource)) : "Le compte source n'existe pas";
-        assert (comptes2.containsKey(numCompteDest)) : "Le compte destination n'existe pas";
+        assert (comptesSource.containsKey(numCompteSource)) : "Le compte source n'existe pas";
+        assert (comptesDest.containsKey(numCompteDest)) : "Le compte destination n'existe pas";
 
-        Compte compteSource = comptes.get(numCompteSource);
-        Compte compteDest = comptes2.get(numCompteDest);
+        Compte compteSource = comptesSource.get(numCompteSource);
+        Compte compteDest = comptesDest.get(numCompteDest);
 
         assert (compteSource.estOuvert()) : "Le compte source est fermé";
         assert (compteDest.estOuvert()) : "Le compte destination est fermé";

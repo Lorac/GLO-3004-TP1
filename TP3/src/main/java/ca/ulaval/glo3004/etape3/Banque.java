@@ -3,6 +3,7 @@ package ca.ulaval.glo3004.etape3;
 import ca.ulaval.glo3004.etape3.exception.DateInvalide;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Banque {
 
@@ -150,7 +151,7 @@ public class Banque {
         assert estValide();
     }
 
-    public HashMap<NumCompte, Compte> getComptes() {
+    public Map<NumCompte, Compte> getComptes() {
         return comptes;
     }
 
