@@ -11,9 +11,15 @@ public class Transaction {
     }
 
     public void versExterieur(NumBanque numBanqueSource, NumBanque numBanqueDest, NumCompte numCompteSource, NumCompte numCompteDest, int montant) {
-        assert (numBanqueSource != numBanqueDest) : "Les numéros de banque doivent être différent";
-        assert (banques.containsKey(numBanqueSource)) : "La banque #1 doit exister";
-        assert (banques.containsKey(numBanqueDest)) : "La banque #2 doit exister";
+        if (numBanqueSource == numBanqueDest) {
+            throw new AssertionError("Les numéros de banque doivent être différent");
+        }
+        if (!banques.containsKey(numBanqueSource)) {
+            throw new AssertionError("La banque #1 doit exister");
+        }
+        if (!banques.containsKey(numBanqueDest)) {
+            throw new AssertionError("La banque #2 doit exister");
+        }
 
         Banque banqueSource = banques.get(numBanqueSource);
         Banque banqueDest = banques.get(numBanqueDest);
@@ -21,22 +27,38 @@ public class Transaction {
         Map<NumCompte, Compte> comptesSource = banqueSource.getComptes();
         Map<NumCompte, Compte> comptesDest = banqueDest.getComptes();
 
-        assert (comptesSource.containsKey(numCompteSource)) : "Le compte source n'existe pas";
-        assert (comptesDest.containsKey(numCompteDest)) : "Le compte destination n'existe pas";
+        if (!comptesSource.containsKey(numCompteSource)) {
+            throw new AssertionError("Le compte source n'existe pas");
+        }
+        if (!comptesDest.containsKey(numCompteDest)) {
+            throw new AssertionError("Le compte destination n'existe pas");
+        }
 
         Compte compteSource = comptesSource.get(numCompteSource);
         Compte compteDest = comptesDest.get(numCompteDest);
 
-        assert (compteSource.estOuvert()) : "Le compte source est fermé";
-        assert (compteDest.estOuvert()) : "Le compte destination est fermé";
+        if (!compteSource.estOuvert()) {
+            throw new AssertionError("Le compte source est fermé");
+        }
+        if (!compteDest.estOuvert()) {
+            throw new AssertionError("Le compte destination est fermé");
+        }
 
-        assert (compteSource.getSolde() - (montant + banqueSource.getFrais()) >= Constants.minSolde) : "Le solde du compte source n'est " +
-                "pas assez élevé";
+        if (compteSource.getSolde() - (montant + banqueSource.getFrais()) < Constants.minSolde) {
+            throw new AssertionError("Le solde du compte source n'est " +
+                    "pas assez élevé");
+        }
 
-        assert (0 < banqueSource.getFrais() + montant);
+        if (0 >= banqueSource.getFrais() + montant) {
+            throw new AssertionError();
+        }
 
-        assert (banqueDest.getFrais() <= (compteDest.getSolde() + montant));
-        assert (banqueDest.getFrais() < montant);
+        if (banqueDest.getFrais() > (compteDest.getSolde() + montant)) {
+            throw new AssertionError();
+        }
+        if (banqueDest.getFrais() >= montant) {
+            throw new AssertionError();
+        }
 
 
         banqueSource.versExterieur(numCompteSource, montant);
