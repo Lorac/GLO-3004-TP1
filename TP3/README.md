@@ -11,4 +11,4 @@ Julien Duchesne (111 042 624), GLO
 * Tests de la classe Banque
 
 ##Exécution du code
-Les tests ont été écrits avec JUnit. Pour les éxécuter, ouvrir le projet dans IntelliJ IDEA de Jetbrains et choisir l'option "Run All Tests"
+Les tests ont été écrit avec JUnit. Pour les éxécuter, ouvrir le projet dans IntelliJ IDEA de Jetbrains et démarrer l'option "Run All Tests"
