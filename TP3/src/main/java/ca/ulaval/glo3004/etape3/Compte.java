@@ -9,7 +9,7 @@ public class Compte {
     private int liquide;
 
     public Compte(int solde, int nip, Date ouverture, Date fermeture) {
-        if (solde < Constants.minSolde && fermeture == null) {
+        if (solde < Constants.minSolde || fermeture != null) {
             throw new IllegalArgumentException();
         }
         this.solde = solde;
