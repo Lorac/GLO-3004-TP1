@@ -5,12 +5,15 @@
 // Julien Duchesne (111 042 624), GLO
 package ca.ulaval.glo3004.etape3;
 
+
+import static ca.ulaval.glo3004.etape3.Constants.maxNum;
+
 class NumCompte {
     private int number;
 
     public NumCompte(int number) {
-        if (number > Constants.maxNum) {
-            throw new IllegalArgumentException();
+        if (number > maxNum || number <= 0) {
+            throw new IllegalArgumentException("Le numéro de compte est invalide");
         }
         this.number = number;
     }

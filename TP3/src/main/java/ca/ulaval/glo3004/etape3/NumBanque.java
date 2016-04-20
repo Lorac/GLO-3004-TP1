@@ -5,13 +5,11 @@
 // Julien Duchesne (111 042 624), GLO
 package ca.ulaval.glo3004.etape3;
 
+
 public class NumBanque {
     private int number;
 
     public NumBanque(int number) {
-        if (number > Constants.maxNum) {
-            throw new IllegalArgumentException();
-        }
         this.number = number;
     }
 

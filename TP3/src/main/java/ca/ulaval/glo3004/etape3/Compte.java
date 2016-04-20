@@ -5,6 +5,8 @@
 // Julien Duchesne (111 042 624), GLO
 package ca.ulaval.glo3004.etape3;
 
+import static ca.ulaval.glo3004.etape3.Constants.minSolde;
+
 public class Compte {
 
     private int solde;
@@ -14,7 +16,7 @@ public class Compte {
     private int liquide;
 
     public Compte(int solde, int nip, Date ouverture, Date fermeture) {
-        if (solde < Constants.minSolde || fermeture != null) {
+        if (solde < minSolde || fermeture != null) {
             throw new IllegalArgumentException();
         }
         this.solde = solde;
@@ -102,6 +104,6 @@ public class Compte {
     }
 
     private boolean estValide() {
-        return (this.liquide <= Constants.maxLiquide && (this.solde >= Constants.minSolde || this.fermeture != null));
+        return (this.liquide <= Constants.maxLiquide && (this.solde >= minSolde || this.fermeture != null));
     }
 }

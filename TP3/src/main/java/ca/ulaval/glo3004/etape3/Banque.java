@@ -10,6 +10,8 @@ import ca.ulaval.glo3004.etape3.exception.DateInvalide;
 import java.util.HashMap;
 import java.util.Map;
 
+import static ca.ulaval.glo3004.etape3.Constants.maxNum;
+
 public class Banque {
 
     private HashMap<NumCompte, Compte> comptes;
@@ -34,7 +36,7 @@ public class Banque {
     }
 
     public void ouvrirCompte(int soldeInitial, NumCompte numeroCompte, Date ouverture) {
-        if (soldeInitial < Constants.minSolde || comptes.size() >= Constants.maxNum || comptes.containsKey(numeroCompte)) {
+        if (soldeInitial < Constants.minSolde || comptes.size() >= maxNum || comptes.containsKey(numeroCompte)) {
             throw new IllegalArgumentException();
         }
         comptes.put(numeroCompte, new Compte(soldeInitial, 0, ouverture, null));
@@ -165,6 +167,6 @@ public class Banque {
     }
 
     private boolean estValide() {
-        return (comptes.size() <= Constants.maxNum && (soldeG - entrees + sorties) == soldeV);
+        return (comptes.size() <= maxNum && (soldeG - entrees + sorties) == soldeV);
     }
 }
