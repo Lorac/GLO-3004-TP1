@@ -5,16 +5,13 @@
 // Julien Duchesne (111 042 624), GLO
 package ca.ulaval.glo3004.etape3;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.HashMap;
-
+import ca.ulaval.glo3004.etape3.exception.DateInvalide;
 import org.junit.Before;
 import org.junit.Test;
 
-import ca.ulaval.glo3004.etape3.exception.DateInvalide;
+import java.util.HashMap;
+
+import static org.junit.Assert.*;
 
 public class BanqueTest {
     private static final NumCompte VALIDNUMCOMPTE = new NumCompte(1);
@@ -55,7 +52,7 @@ public class BanqueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void givenABanqueAtCapacity_WhenOpeningCompte_ThenThrowsError() throws Exception {
-        for (int i = 0; i < Constants.maxNum; i++) {
+        for (int i = 1; i <= Constants.maxNum; i++) {
             banque.getComptes().put(new NumCompte(i), null);
         }
         Date date = new Date(1, 1, 1990);
